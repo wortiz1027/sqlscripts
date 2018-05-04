@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS `security`.`tbl_sec_users` (
   `fecha_nacimiento` DATETIME NOT NULL,
   `telefono` BIGINT(255) NOT NULL,
   `email` VARCHAR(512) NOT NULL,
-  `login` VARCHAR(100) NOT NULL,
+  `username` VARCHAR(100) NOT NULL,
   `password` VARCHAR(512) NOT NULL,
   `enable` VARCHAR(45) NULL,
   `account_non_expired` VARCHAR(45) NULL,
@@ -201,7 +201,7 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 -- -----------------------------------------------------
 START TRANSACTION;
 USE `security`;
-INSERT INTO `security`.`tbl_sec_users` (`id_user`, `cedula`, `nombres`, `apellidos`, `direccion`, `fecha_nacimiento`, `telefono`, `email`, `login`, `password`, `enable`, `account_non_expired`, `credential_non_expired`, `account_non_locket`) VALUES (DEFAULT, 8649168, 'Wilman Alberto', 'Ortiz Navarro', 'Calle 123', '1984-10-27', 301638457, 'willman.ortiz@gmail.com', 'root', '$2a$10$tartLAsO2Bm8iMtrqdyQXua/CMZ3/8260G/c4OKza6DslRKexKSuW', 'true', 'true', 'true', NULL);
+INSERT INTO `security`.`tbl_sec_users` (`id_user`, `cedula`, `nombres`, `apellidos`, `direccion`, `fecha_nacimiento`, `telefono`, `email`, `username`, `password`, `enable`, `account_non_expired`, `credential_non_expired`, `account_non_locket`) VALUES (DEFAULT, 8649168, 'Wilman Alberto', 'Ortiz Navarro', 'Calle 123', '1984-10-27', 301638457, 'willman.ortiz@gmail.com', 'root', '$2a$10$tartLAsO2Bm8iMtrqdyQXua/CMZ3/8260G/c4OKza6DslRKexKSuW', 'true', 'true', 'true', NULL);
 
 COMMIT;
 
