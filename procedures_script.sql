@@ -16,16 +16,16 @@ CREATE OR REPLACE PACKAGE bpm_credit_process AS
     FUNCTION generar_ramdon RETURN VARCHAR2;
 
     -- PROCEDIMIENTO QUE GUARDA EL NUMERO DE SOLICTUD
-    PROCEDURE generar_solicitud (numSolicitud OUT numero_solicitud);
+    PROCEDURE generar_solicitud (estado OUT CabeceraMensaje, solicitud OUT Solicitud);
 
     -- PROCEDIMIENTO PARA RADICAR SOLICITUD
-    PROCEDURE radicar_solicitud;
+    PROCEDURE radicar_solicitud (radicar IN RadicarSolicitud, estado OUT CabeceraMensaje);
 
     -- PROCEDIMIENTO PARA APROBACION AUTOMATICA
-    PROCEDURE aprobar_solicitud;
+    PROCEDURE aprobacion_automatica (aprobacion IN AutoAprobacion, estado OUT CabeceraMensaje);
 
     -- PROCEDIMIENTO PARA ENVIAR NOTIFICACIONES
-    PROCEDURE enviar_notificacion;
+    PROCEDURE enviar_notificacion (notificacion IN Notificaciones, estado OUT CabeceraMensaje);
 
 END bpm_credit_process;
 /
@@ -35,23 +35,38 @@ CREATE OR REPLACE PACKAGE BODY bpm_credit_process AS
     FUNCTION generar_ramdon RETURN VARCHAR2 AS
         numero_aleatorio NUMBER;
         numero_solicitud VARCHAR2(256);
-    BEGIN
+      BEGIN
           SELECT ROUND(DBMS_RANDOM.VALUE(10000000, 999999999)) numero
           INTO numero_aleatorio
           FROM DUAL;
 
           RETURN CONCAT(base_numero_solicitud, TO_CHAR(numero_aleatorio));
-    END; -- generar_ramdon
+      END; -- generar_ramdon
 
-    PROCEDURE generar_solicitud (numSolicitud OUT numero_solicitud) AS
-    BEGIN
-      numeroSolicitud := generar_ramdon();
+    PROCEDURE generar_solicitud (estado OUT CabeceraMensaje, solicitud OUT Solicitud) AS
+      BEGIN
+        numeroSolicitud := generar_ramdon();
 
-      INSERT INTO T01_SOLICITUDES (NUMERO_SOLICITUD) VALUES (numeroSolicitud);
+        INSERT INTO T01_SOLICITUDES (NUMERO_SOLICITUD) VALUES (numeroSolicitud);
 
-      EXCEPTION
-          WHEN OTHERS THEN
+        COMMIT;
 
-    END; -- generar_solicitud
+        -- TODO Falta consecutivo generado
+        solicitud := Solicitud(numeroSolicitud);
+        estado := CabeceraMensaje('OK', '000', 'Solicitud generada exitosamente');
+        EXCEPTION
+            WHEN OTHERS THEN
+                 estado := CabeceraMensaje('ER', '111', CONCAT('Error generando la solicitud - ', SQLCODE, ' - ', SQLERRM));
+                 ROLLBACK;
+      END; -- generar_solicitud
+
+    PROCEDURE aprobacion_automatica (aprobacion IN AutoAprobacion, estado OUT CabeceraMensaje) AS
+      BEGIN
+      END; -- radicar_solicitud
+
+    PROCEDURE enviar_notificacion (notificacion IN Notificaciones, estado OUT CabeceraMensaje) AS
+      BEGIN
+      END; -- radicar_solicitud
+
 END bpm_credit_process;
 /
