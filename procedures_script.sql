@@ -138,7 +138,7 @@ CREATE OR REPLACE PACKAGE BODY bpm_credit_process AS
              ROLLBACK;
       END; -- aprobacion_automatica
 
-    PROCEDURE enviar_notificacion (notificacion IN Notificaciones, estado OUT CabeceraMensaje) AS
+    PROCEDURE enviar_notificacion (inCliente IN Cliente, notificacion IN Notificaciones, estado OUT CabeceraMensaje) AS
 		DESCRIPCION T06_TIPO_NOTIFICACION.DESC_TIPO_NOTIFICACION%TYPE;
 		MENSAJE     T06_TIPO_NOTIFICACION.PLANTILLA_NOTIFICACION%TYPE;
 	  BEGIN
@@ -146,9 +146,13 @@ CREATE OR REPLACE PACKAGE BODY bpm_credit_process AS
 		   SELECT DESC_TIPO_NOTIFICACION, PLANTILLA_NOTIFICACION INTO DESCRIPCION, MENSAJE
 		   FROM T06_TIPO_NOTIFICACION
 		   WHERE DESC_TIPO_NOTIFICACION = notificacion.tipo.codigo_tipo_notificacion;
-			
+		   
+		   -- TODO reemplazar Keys en la plantilla	
+		   REPLACE(MENSAJE, '<NOMBRES_APELLIDOS>', inCliente.nombres || ' ' || inCliente.apellidos);
+		   REPLACE(MENSAJE, '<NUMERO_SOLICITUD>', notificacion.informacionSolicitud.numeroSolicitud);
+		   
 		   INSERT INTO T04_NOTIFICACIONES(CONS_SOLICITUD,CONS_TIPO_NOTIFICACION, MENSAJE_NOTIVICACION) 
-		          VALUES (notificacion.informacionSolicitud.consecutivo_solicitud, notificacion.tipo.codigo_tipo_notificacion, notificacion.plantilla);
+		          VALUES (notificacion.informacionSolicitud.consecutivo_solicitud, notificacion.tipo.codigo_tipo_notificacion, MENSAJE);
 		   COMMIT;	  
            estado := CabeceraMensaje('OK', '000', 'Notificacion enviada exitosamente');
       EXCEPTION
